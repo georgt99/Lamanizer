@@ -35,6 +35,7 @@ public class Linkage : MonoBehaviour
         {
             foreach (Vertex adj in v.edges)
             {
+                if (v.GetInstanceID() < adj.GetInstanceID()) continue; // only once per undirected edge
                 if (v.rigidComponent != adj.rigidComponent)
                 {
                     AddFlexibleLink(v, adj);
@@ -117,7 +118,11 @@ public class Linkage : MonoBehaviour
             linkThickness);
 
         Vector3 vec1to2 = vec2 - vec1;
-        Vector3 orthogonal = Vector3.Cross(vec1to2, Vector3.right); // it shouldn't matter what second vector to take here
+        Vector3 otherVector = // cheap workaround, in case a cylinder would be is parallel to Vector3.right
+            Vector3.Distance(vec1to2.normalized, Vector3.right) < 0.1f || Vector3.Distance(vec1to2.normalized, -Vector3.right) < 0.1f ?
+            Vector3.up :
+            Vector3.right;
+        Vector3 orthogonal = Vector3.Cross(vec1to2, otherVector); // it shouldn't matter what second vector to take here (aside from above edge case)
         cylinder.transform.LookAt(
             cylinder.transform.position + orthogonal,
             vec1to2
