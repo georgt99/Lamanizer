@@ -71,4 +71,11 @@ public class LinkageEditor : Editor
     }
 
 
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+        EditorGUILayout.HelpBox("Right-click 2 Vertices to create a new edge or remove an existing edge between them.", MessageType.Info);
+        
+    }
+
 }

@@ -16,14 +16,15 @@ public class Linkage : MonoBehaviour
     private void Start()
     {
         verts = GetComponentsInChildren<Vertex>();
+        MakeEdgesUndirected();
         rigidComps = new List<RigidComponent>();
 
         flexibleLinkHolder = new GameObject("Linkages").transform;
         flexibleLinkHolder.parent = transform;
         flexibleLinkHolder.localPosition = Vector3.zero;
 
-        List<List<Vertex>> rigidVertCollections = FindRigidComponents();
-
+        Lamanizer lama = new Lamanizer(verts);
+        List<List<Vertex>> rigidVertCollections = lama.FindRigidComponents();
 
         foreach (List<Vertex> vertCollection in rigidVertCollections)
         {
@@ -47,19 +48,16 @@ public class Linkage : MonoBehaviour
     }
 
 
-    private List<List<Vertex>> FindRigidComponents()
+    private void MakeEdgesUndirected()
     {
-        //placeholder-implementation: each vertex is its own component
-        List < List < Vertex >> components = new List<List<Vertex>>();
         foreach(Vertex v in verts)
         {
-            List<Vertex> newComp = new List<Vertex>();
-            newComp.Add(v);
-            components.Add(newComp);
+            foreach(Vertex adj in v.edges)
+            {
+                if (!adj.edges.Contains(v)) adj.edges.Add(v);
+            }
         }
-        return components;
     }
-
 
     private RigidComponent CreateRigidComponent(List<Vertex> vertsOfComponent)
     {
@@ -136,7 +134,7 @@ public class Linkage : MonoBehaviour
         joint.yMotion = ConfigurableJointMotion.Locked;
         joint.zMotion = ConfigurableJointMotion.Locked;
 
-        joint.angularYMotion = ConfigurableJointMotion.Locked;
+        //joint.angularYMotion = ConfigurableJointMotion.Locked;
 
         joint.anchor = v.transform.localPosition;
         // TODO: set better values for simulation?
